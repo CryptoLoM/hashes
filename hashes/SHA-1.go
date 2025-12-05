@@ -7,10 +7,7 @@ import (
 	"math"
 	"math/rand"
 	"strconv"
-	"time"
 )
-
-// --- Конфігурація Практикуму ---
 
 const (
 	HASH_ALGORITHM  = "SHA1"
@@ -18,8 +15,6 @@ const (
 	BIRTHDAY_BITS   = 32
 	NUM_EXPERIMENTS = 100
 )
-
-// --- Допоміжні функції ---
 
 func calculateHash(data []byte) string {
 	h := sha1.New()
@@ -78,7 +73,6 @@ func PreimageAttack(initialMsg string, isSequential bool, bits int) int {
 	}
 }
 
-// ВИПРАВЛЕНА Birthday Attack
 func BirthdayAttack(initialMsg string, isSequential bool, bits int) int {
 	// Зберігаємо: truncated_hash -> (повідомлення, повний хеш)
 	type HashEntry struct {
@@ -109,7 +103,7 @@ func BirthdayAttack(initialMsg string, isSequential bool, bits int) int {
 
 		// Перевіряємо, чи бачили цей усічений геш раніше
 		if entry, found := seenHashes[truncHash]; found {
-			// ВАЖЛИВО: Перевіряємо, що це різні повідомлення
+			// Перевіряємо, що це різні повідомлення
 			// (інакше це не колізія, а дублікат)
 			if entry.message != candidateMsg {
 				// Колізія знайдена!
@@ -154,13 +148,12 @@ func calculateStatistics(results []int) (float64, float64) {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
 
 	fmt.Printf("--- Комп'ютерний практикум №1: %s (Ускладнена форма) ---\n", HASH_ALGORITHM)
 	fmt.Printf("Кількість запусків: %d\n", NUM_EXPERIMENTS)
 	fmt.Printf("Складність пошуку прообразу (теоретична): O(2^%d) = %d спроб\n",
 		PREIMAGE_BITS, 1<<PREIMAGE_BITS)
-	// Теоретичне математичне очікування для Birthday Attack
+	// Теоретичне математичне сподівання для Birthday Attack
 	// E[n] ≈ √(π/2 × m) ≈ 1.253 × √m, де m = 2^BIRTHDAY_BITS
 	birthdayExpected := math.Sqrt(math.Pi/2.0) * math.Sqrt(float64(1<<BIRTHDAY_BITS))
 	fmt.Printf("Складність атаки днів народження (теоретична): O(√2^%d) ≈ %.0f спроб\n",
@@ -176,7 +169,7 @@ func main() {
 	preimageRandResults := make([]int, 0, NUM_EXPERIMENTS)
 
 	for i := 1; i <= NUM_EXPERIMENTS; i++ {
-		initialMsg := fmt.Sprintf("Ваше_ПІБ_експеримент_%d_%d", i, rand.Intn(10000))
+		initialMsg := fmt.Sprintf("Гутовський_Матвій_експеримент%d_%d", i, rand.Intn(10000))
 
 		resultSeq := PreimageAttack(initialMsg, true, PREIMAGE_BITS)
 		if resultSeq > 0 {
@@ -231,7 +224,7 @@ func main() {
 	meanSeq, varianceSeq = calculateStatistics(birthdaySeqResults)
 	meanRand, varianceRand = calculateStatistics(birthdayRandResults)
 
-	// Теоретичне математичне очікування: E[n] = √(π/2 × 2^BIRTHDAY_BITS)
+	//  E[n] = √(π/2 × 2^BIRTHDAY_BITS)
 	expectedBirthday := math.Sqrt(math.Pi/2.0) * math.Sqrt(float64(1<<BIRTHDAY_BITS))
 
 	fmt.Printf("### Результати (Варіант 1: Послідовне)\n")
@@ -268,4 +261,5 @@ func main() {
 	fmt.Printf("  Birthday Attack з %d бітами еквівалентна Preimage Attack з %d бітами\n",
 		BIRTHDAY_BITS, BIRTHDAY_BITS/2)
 	fmt.Printf("  Обидві мають складність O(2^%d) ≈ 65,536-82,000 спроб\n", BIRTHDAY_BITS/2)
+
 }
