@@ -74,7 +74,7 @@ func PreimageAttack(initialMsg string, isSequential bool, bits int) int {
 }
 
 func BirthdayAttack(initialMsg string, isSequential bool, bits int) int {
-	// Зберігаємо: truncated_hash -> (повідомлення, повний хеш)
+	// Зберігаємо: truncated_hash -> (повідомлення, повний геш)
 	type HashEntry struct {
 		message  string
 		fullHash string
@@ -107,8 +107,8 @@ func BirthdayAttack(initialMsg string, isSequential bool, bits int) int {
 			// (інакше це не колізія, а дублікат)
 			if entry.message != candidateMsg {
 				// Колізія знайдена!
-				// fmt.Printf("Колізія! Повідомлення 1: %s (хеш: %s)\n", entry.message, entry.fullHash)
-				// fmt.Printf("Повідомлення 2: %s (хеш: %s)\n", candidateMsg, fullHash)
+				// fmt.Printf("Колізія! Повідомлення 1: %s (геш: %s)\n", entry.message, entry.fullHash)
+				// fmt.Printf("Повідомлення 2: %s (геш: %s)\n", candidateMsg, fullHash)
 				return count
 			}
 		}
@@ -188,14 +188,14 @@ func main() {
 	fmt.Printf("### Результати (Варіант 1: Послідовне)\n")
 	fmt.Printf("Середнє (M): %.2f\n", meanSeq)
 	fmt.Printf("Дисперсія (D): %.2f\n", varianceSeq)
-	fmt.Printf("СКО: ±%.2f\n", math.Sqrt(varianceSeq))
+	fmt.Printf("СКВ: ±%.2f\n", math.Sqrt(varianceSeq))
 	fmt.Printf("Відхилення від теорії: %.2f%%\n",
 		math.Abs(meanSeq-float64(1<<PREIMAGE_BITS))/float64(1<<PREIMAGE_BITS)*100)
 
 	fmt.Printf("\n### Результати (Варіант 2: Випадкові модифікації)\n")
 	fmt.Printf("Середнє (M): %.2f\n", meanRand)
 	fmt.Printf("Дисперсія (D): %.2f\n", varianceRand)
-	fmt.Printf("СКО: ±%.2f\n", math.Sqrt(varianceRand))
+	fmt.Printf("СКВ: ±%.2f\n", math.Sqrt(varianceRand))
 	fmt.Printf("Відхилення від теорії: %.2f%%\n",
 		math.Abs(meanRand-float64(1<<PREIMAGE_BITS))/float64(1<<PREIMAGE_BITS)*100)
 
@@ -208,7 +208,7 @@ func main() {
 	birthdayRandResults := make([]int, 0, NUM_EXPERIMENTS)
 
 	for i := 1; i <= NUM_EXPERIMENTS; i++ {
-		initialMsg := fmt.Sprintf("Інше_ПІБ_експеримент_%d_%d", i, rand.Intn(10000))
+		initialMsg := fmt.Sprintf("Інше_ПІБ_експеримент_1%d_%d", i, rand.Intn(10000))
 
 		resultSeq := BirthdayAttack(initialMsg, true, BIRTHDAY_BITS)
 		if resultSeq > 0 {
@@ -230,7 +230,7 @@ func main() {
 	fmt.Printf("### Результати (Варіант 1: Послідовне)\n")
 	fmt.Printf("Середнє (M): %.2f\n", meanSeq)
 	fmt.Printf("Дисперсія (D): %.2f\n", varianceSeq)
-	fmt.Printf("СКО: ±%.2f\n", math.Sqrt(varianceSeq))
+	fmt.Printf("СКВ: ±%.2f\n", math.Sqrt(varianceSeq))
 	fmt.Printf("Теоретичне очікування: %.2f спроб\n", expectedBirthday)
 	fmt.Printf("Відхилення від теорії: %.2f%%\n",
 		math.Abs(meanSeq-expectedBirthday)/expectedBirthday*100)
@@ -238,7 +238,7 @@ func main() {
 	fmt.Printf("\n### Результати (Варіант 2: Випадкові модифікації)\n")
 	fmt.Printf("Середнє (M): %.2f\n", meanRand)
 	fmt.Printf("Дисперсія (D): %.2f\n", varianceRand)
-	fmt.Printf("СКО: ±%.2f\n", math.Sqrt(varianceRand))
+	fmt.Printf("СКВ: ±%.2f\n", math.Sqrt(varianceRand))
 	fmt.Printf("Теоретичне очікування: %.2f спроб\n", expectedBirthday)
 	fmt.Printf("Відхилення від теорії: %.2f%%\n",
 		math.Abs(meanRand-expectedBirthday)/expectedBirthday*100)
@@ -261,5 +261,4 @@ func main() {
 	fmt.Printf("  Birthday Attack з %d бітами еквівалентна Preimage Attack з %d бітами\n",
 		BIRTHDAY_BITS, BIRTHDAY_BITS/2)
 	fmt.Printf("  Обидві мають складність O(2^%d) ≈ 65,536-82,000 спроб\n", BIRTHDAY_BITS/2)
-
 }
